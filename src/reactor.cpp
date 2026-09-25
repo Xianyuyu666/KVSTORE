@@ -1,23 +1,27 @@
-#include <kvstore/net/reactor.h>
-
+#include "kvstore/net/reactor.h"
 #include <sys/epoll.h>
-#include <unistd.h>
-#include <cstring>
-#include <cerrno>
 
-Reactor::Reactor(int max_events = 1024){
-    epfd_ = epoll_create1(0);
+Reactor::Reactor(){
+    epfd = epoll_create1(0);    
+}
+
+void Reactor::add_fd(int fd,uint32_t event,Callback_func cb){
+    epoll_event ev{};
+    ev.data.fd = fd;
+    ev.events = event;
+    epoll_ctl(epfd,EPOLL_CTL_ADD,fd,&ev);
+    Callbacks[fd] = cb;
 }
 
 void Reactor::loop(){
-    while(running_){
-        int n = epoll_wait(epfd_,events_.data(),max_events_,-1);
+    while(true){
+        ssize_t n = epoll_wait(epfd,events,MAX_EVENTS,-1);
         for(int i = 0;i < n;i++){
-            int fd = events_[i].data.fd;
-            callbacks_[fd](events_[i].events);
+            int fd = events[i].data.fd;
+            uint32_t e = events[i].events;
+            if(Callbacks.find(fd) != Callbacks.end()){
+                Callbacks[fd](fd,e);
+            }
         }
     }
 }
-
-
-

@@ -7,8 +7,26 @@
 },
 {
   "directory": "/home/ailu_dickcd/kvstore/build",
+  "command": "/usr/bin/c++  -I/home/ailu_dickcd/kvstore/include -fsanitize=address -fno-omit-frame-pointer -g -std=gnu++17 -Wall -Wextra -Wpedantic -o CMakeFiles/kvstore.dir/src/reactor.cpp.o -c /home/ailu_dickcd/kvstore/src/reactor.cpp",
+  "file": "/home/ailu_dickcd/kvstore/src/reactor.cpp",
+  "output": "CMakeFiles/kvstore.dir/src/reactor.cpp.o"
+},
+{
+  "directory": "/home/ailu_dickcd/kvstore/build",
   "command": "/usr/bin/c++   -fsanitize=address -fno-omit-frame-pointer -g -std=gnu++17 -Wall -Wextra -Wpedantic -o CMakeFiles/echo_client.dir/src/echo_client.cpp.o -c /home/ailu_dickcd/kvstore/src/echo_client.cpp",
   "file": "/home/ailu_dickcd/kvstore/src/echo_client.cpp",
   "output": "CMakeFiles/echo_client.dir/src/echo_client.cpp.o"
+},
+{
+  "directory": "/home/ailu_dickcd/kvstore/build",
+  "command": "/usr/bin/c++  -I/home/ailu_dickcd/kvstore/include -fsanitize=address -fno-omit-frame-pointer -g -std=gnu++17 -Wall -Wextra -Wpedantic -o CMakeFiles/test.dir/src/test.cpp.o -c /home/ailu_dickcd/kvstore/src/test.cpp",
+  "file": "/home/ailu_dickcd/kvstore/src/test.cpp",
+  "output": "CMakeFiles/test.dir/src/test.cpp.o"
+},
+{
+  "directory": "/home/ailu_dickcd/kvstore/build",
+  "command": "/usr/bin/c++  -I/home/ailu_dickcd/kvstore/include -fsanitize=address -fno-omit-frame-pointer -g -std=gnu++17 -Wall -Wextra -Wpedantic -o CMakeFiles/test.dir/src/reactor.cpp.o -c /home/ailu_dickcd/kvstore/src/reactor.cpp",
+  "file": "/home/ailu_dickcd/kvstore/src/reactor.cpp",
+  "output": "CMakeFiles/test.dir/src/reactor.cpp.o"
 }
 ]

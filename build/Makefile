@@ -142,6 +142,19 @@ echo_client/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/echo_client.dir/build.make CMakeFiles/echo_client.dir/build
 .PHONY : echo_client/fast
 
+#=============================================================================
+# Target rules for targets named test
+
+# Build rule for target.
+test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test
+.PHONY : test
+
+# fast build rule for target.
+test/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
+.PHONY : test/fast
+
 src/echo_client.o: src/echo_client.cpp.o
 .PHONY : src/echo_client.o
 
@@ -190,6 +203,57 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/reactor.o: src/reactor.cpp.o
+.PHONY : src/reactor.o
+
+# target to build an object file
+src/reactor.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/reactor.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/reactor.cpp.o
+.PHONY : src/reactor.cpp.o
+
+src/reactor.i: src/reactor.cpp.i
+.PHONY : src/reactor.i
+
+# target to preprocess a source file
+src/reactor.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/reactor.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/reactor.cpp.i
+.PHONY : src/reactor.cpp.i
+
+src/reactor.s: src/reactor.cpp.s
+.PHONY : src/reactor.s
+
+# target to generate assembly for a file
+src/reactor.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/reactor.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/reactor.cpp.s
+.PHONY : src/reactor.cpp.s
+
+src/test.o: src/test.cpp.o
+.PHONY : src/test.o
+
+# target to build an object file
+src/test.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.o
+.PHONY : src/test.cpp.o
+
+src/test.i: src/test.cpp.i
+.PHONY : src/test.i
+
+# target to preprocess a source file
+src/test.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.i
+.PHONY : src/test.cpp.i
+
+src/test.s: src/test.cpp.s
+.PHONY : src/test.s
+
+# target to generate assembly for a file
+src/test.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.s
+.PHONY : src/test.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -200,12 +264,19 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... echo_client"
 	@echo "... kvstore"
+	@echo "... test"
 	@echo "... src/echo_client.o"
 	@echo "... src/echo_client.i"
 	@echo "... src/echo_client.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/reactor.o"
+	@echo "... src/reactor.i"
+	@echo "... src/reactor.s"
+	@echo "... src/test.o"
+	@echo "... src/test.i"
+	@echo "... src/test.s"
 .PHONY : help
 
 

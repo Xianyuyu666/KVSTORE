@@ -8,9 +8,9 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
-  "/home/ailu_dickcd/kvstore/src/main.cpp" "CMakeFiles/kvstore.dir/src/main.cpp.o" "gcc" "CMakeFiles/kvstore.dir/src/main.cpp.o.d"
-  "/home/ailu_dickcd/kvstore/src/reactor.cpp" "CMakeFiles/kvstore.dir/src/reactor.cpp.o" "gcc" "CMakeFiles/kvstore.dir/src/reactor.cpp.o.d"
-  "" "kvstore" "gcc" "CMakeFiles/kvstore.dir/link.d"
+  "/home/ailu_dickcd/kvstore/src/reactor.cpp" "CMakeFiles/test.dir/src/reactor.cpp.o" "gcc" "CMakeFiles/test.dir/src/reactor.cpp.o.d"
+  "/home/ailu_dickcd/kvstore/src/test.cpp" "CMakeFiles/test.dir/src/test.cpp.o" "gcc" "CMakeFiles/test.dir/src/test.cpp.o.d"
+  "" "test" "gcc" "CMakeFiles/test.dir/link.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

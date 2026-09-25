@@ -16,6 +16,7 @@ int main(){
         return 1;
     }
     std::string msg = "hello from client\n";
+    std::cout << "客户端发送：" << msg;
     send(fd,msg.data(),msg.size(),0);
     char buf[1024];
     ssize_t n = recv(fd,buf,sizeof(buf),0);

@@ -16,9 +16,11 @@ add_compile_options(-Wall -Wextra -Wpedantic) # 更多警告
 set(CMAKE_CXX_FLAGS_DEBUG "-fsanitize=address -fno-omit-frame-pointer -g")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-fsanitize=address")
 
-add_executable(kvstore src/main.cpp)
+add_executable(kvstore src/main.cpp src/reactor.cpp)
 add_executable(echo_client src/echo_client.cpp)
+add_executable(test src/test.cpp src/reactor.cpp)
 
 target_include_directories(kvstore PRIVATE include)
+target_include_directories(test PRIVATE include)
 
 
