@@ -48,6 +48,4 @@ set(CMAKE_MAKEFILE_PRODUCTS
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/kvstore.dir/DependInfo.cmake"
-  "CMakeFiles/echo_client.dir/DependInfo.cmake"
-  "CMakeFiles/test.dir/DependInfo.cmake"
   )

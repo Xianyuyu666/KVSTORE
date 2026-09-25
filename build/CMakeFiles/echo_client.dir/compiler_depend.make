@@ -22,6 +22,7 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/c++/15/bits/basic_string.tcc \
   /usr/include/c++/15/bits/char_traits.h \
   /usr/include/c++/15/bits/charconv.h \
+  /usr/include/c++/15/bits/chrono.h \
   /usr/include/c++/15/bits/concept_check.h \
   /usr/include/c++/15/bits/cpp_type_traits.h \
   /usr/include/c++/15/bits/cxxabi_forced.h \
@@ -48,6 +49,7 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/c++/15/bits/ostream.h \
   /usr/include/c++/15/bits/ostream.tcc \
   /usr/include/c++/15/bits/ostream_insert.h \
+  /usr/include/c++/15/bits/parse_numbers.h \
   /usr/include/c++/15/bits/postypes.h \
   /usr/include/c++/15/bits/predefined_ops.h \
   /usr/include/c++/15/bits/ptr_traits.h \
@@ -55,6 +57,7 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/c++/15/bits/refwrap.h \
   /usr/include/c++/15/bits/requires_hosted.h \
   /usr/include/c++/15/bits/std_abs.h \
+  /usr/include/c++/15/bits/std_thread.h \
   /usr/include/c++/15/bits/stl_algobase.h \
   /usr/include/c++/15/bits/stl_construct.h \
   /usr/include/c++/15/bits/stl_function.h \
@@ -66,6 +69,8 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/c++/15/bits/streambuf_iterator.h \
   /usr/include/c++/15/bits/string_view.tcc \
   /usr/include/c++/15/bits/stringfwd.h \
+  /usr/include/c++/15/bits/this_thread_sleep.h \
+  /usr/include/c++/15/bits/unique_ptr.h \
   /usr/include/c++/15/bits/uses_allocator.h \
   /usr/include/c++/15/bits/uses_allocator_args.h \
   /usr/include/c++/15/bits/utility.h \
@@ -75,8 +80,10 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/c++/15/clocale \
   /usr/include/c++/15/concepts \
   /usr/include/c++/15/cstddef \
+  /usr/include/c++/15/cstdint \
   /usr/include/c++/15/cstdio \
   /usr/include/c++/15/cstdlib \
+  /usr/include/c++/15/ctime \
   /usr/include/c++/15/cwchar \
   /usr/include/c++/15/cwctype \
   /usr/include/c++/15/debug/assertions.h \
@@ -92,14 +99,17 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/c++/15/iosfwd \
   /usr/include/c++/15/iostream \
   /usr/include/c++/15/istream \
+  /usr/include/c++/15/limits \
   /usr/include/c++/15/new \
   /usr/include/c++/15/ostream \
   /usr/include/c++/15/pstl/pstl_config.h \
+  /usr/include/c++/15/ratio \
   /usr/include/c++/15/stdexcept \
   /usr/include/c++/15/streambuf \
   /usr/include/c++/15/string \
   /usr/include/c++/15/string_view \
   /usr/include/c++/15/system_error \
+  /usr/include/c++/15/thread \
   /usr/include/c++/15/tuple \
   /usr/include/c++/15/type_traits \
   /usr/include/c++/15/typeinfo \
@@ -119,6 +129,7 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/stdc-predef.h \
+  /usr/include/stdint.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
   /usr/include/time.h \
@@ -159,6 +170,7 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/x86_64-linux-gnu/bits/socket.h \
   /usr/include/x86_64-linux-gnu/bits/socket_type.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
+  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
   /usr/include/x86_64-linux-gnu/bits/stdio_lim.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
@@ -223,7 +235,8 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o: /home/ailu_dickcd/kvstore/src/
   /usr/include/x86_64-linux-gnu/sys/socket.h \
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/lib/gcc/x86_64-linux-gnu/15/include/stdarg.h \
-  /usr/lib/gcc/x86_64-linux-gnu/15/include/stddef.h
+  /usr/lib/gcc/x86_64-linux-gnu/15/include/stddef.h \
+  /usr/lib/gcc/x86_64-linux-gnu/15/include/stdint.h
 
 echo_client: /lib64/ld-linux-x86-64.so.2 \
   /usr/lib/x86_64-linux-gnu/Scrt1.o \
@@ -246,8 +259,6 @@ echo_client: /lib64/ld-linux-x86-64.so.2 \
   CMakeFiles/echo_client.dir/src/echo_client.cpp.o
 
 
-/usr/lib/x86_64-linux-gnu/libc.so.6:
-
 /usr/lib/gcc/x86_64-linux-gnu/15/libstdc++.so:
 
 /usr/lib/gcc/x86_64-linux-gnu/15/libgcc_s.so:
@@ -263,6 +274,8 @@ echo_client: /lib64/ld-linux-x86-64.so.2 \
 /usr/lib/x86_64-linux-gnu/crti.o:
 
 /usr/lib/x86_64-linux-gnu/Scrt1.o:
+
+/usr/lib/gcc/x86_64-linux-gnu/15/include/stdint.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/15/include/stdarg.h:
 
@@ -294,21 +307,15 @@ echo_client: /lib64/ld-linux-x86-64.so.2 \
 
 /usr/include/x86_64-linux-gnu/bits/typesizes.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
-
 /usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/sigset_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h:
 
@@ -348,6 +355,10 @@ echo_client: /lib64/ld-linux-x86-64.so.2 \
 
 /usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-least.h:
+
 /usr/include/x86_64-linux-gnu/bits/socket_type.h:
 
 /usr/include/x86_64-linux-gnu/bits/select.h:
@@ -363,8 +374,6 @@ echo_client: /lib64/ld-linux-x86-64.so.2 \
 /usr/include/x86_64-linux-gnu/c++/15/bits/ctype_inline.h:
 
 /usr/include/x86_64-linux-gnu/bits/locale.h:
-
-/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
 
 /usr/include/x86_64-linux-gnu/bits/in.h:
 
@@ -390,11 +399,23 @@ echo_client: /lib64/ld-linux-x86-64.so.2 \
 
 /usr/include/x86_64-linux-gnu/asm/sockios.h:
 
-/usr/include/c++/15/bits/stl_iterator.h:
+/usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
-/usr/include/alloca.h:
+/usr/include/x86_64-linux-gnu/asm/errno.h:
 
-/usr/include/features.h:
+/usr/include/x86_64-linux-gnu/sys/select.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
+
+/usr/include/unistd.h:
+
+/usr/include/time.h:
+
+/usr/include/x86_64-linux-gnu/asm/socket.h:
+
+/usr/include/stdlib.h:
+
+/usr/include/stdio.h:
 
 /usr/include/c++/15/ostream:
 
@@ -407,6 +428,12 @@ echo_client: /lib64/ld-linux-x86-64.so.2 \
 /usr/include/c++/15/bits/std_abs.h:
 
 /usr/include/c++/15/typeinfo:
+
+/usr/include/x86_64-linux-gnu/bits/errno.h:
+
+/usr/include/wctype.h:
+
+/usr/include/c++/15/bits/ostream_insert.h:
 
 /usr/include/c++/15/bits/ostream.tcc:
 
@@ -424,13 +451,23 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/asm-generic/sockios.h:
 
+/usr/lib/x86_64-linux-gnu/libc.so.6:
+
+/usr/include/c++/15/bits/parse_numbers.h:
+
 /usr/include/c++/15/bits/localefwd.h:
 
 /usr/include/c++/15/bits/functexcept.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
+/usr/include/x86_64-linux-gnu/asm/posix_types.h:
 
-/usr/include/x86_64-linux-gnu/asm/errno.h:
+/usr/include/c++/15/bits/postypes.h:
+
+/usr/include/c++/15/bits/std_thread.h:
+
+/usr/include/wchar.h:
+
+/usr/include/c++/15/bits/ios_base.h:
 
 /usr/include/c++/15/bits/alloc_traits.h:
 
@@ -451,10 +488,6 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 /usr/include/x86_64-linux-gnu/bits/sockaddr.h:
 
 /usr/include/c++/15/bits/range_access.h:
-
-/usr/include/c++/15/bits/locale_facets.tcc:
-
-/usr/include/ctype.h:
 
 /usr/include/x86_64-linux-gnu/asm/types.h:
 
@@ -487,6 +520,14 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 /usr/include/c++/15/bits/cpp_type_traits.h:
 
 /usr/include/c++/15/streambuf:
+
+/usr/include/x86_64-linux-gnu/bits/long-double.h:
+
+/usr/include/c++/15/bits/basic_string.tcc:
+
+/usr/include/arpa/inet.h:
+
+/usr/include/c++/15/string_view:
 
 /usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
@@ -530,6 +571,12 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/c++/15/bits/exception.h:
 
+/usr/include/alloca.h:
+
+/usr/include/c++/15/bits/stl_iterator.h:
+
+/usr/include/c++/15/bits/this_thread_sleep.h:
+
 /usr/include/c++/15/bits/allocator.h:
 
 /usr/include/stdc-predef.h:
@@ -540,7 +587,15 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/c++/15/bits/stl_iterator_base_types.h:
 
+/usr/include/ctype.h:
+
+/usr/include/c++/15/bits/locale_facets.tcc:
+
+/usr/include/features.h:
+
 /usr/include/asm-generic/errno.h:
+
+/usr/include/stdint.h:
 
 /usr/include/c++/15/bits/basic_ios.h:
 
@@ -572,17 +627,9 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/c++/15/bits/exception_defines.h:
 
-/usr/include/x86_64-linux-gnu/bits/long-double.h:
+/usr/include/c++/15/bits/chrono.h:
 
-/usr/include/c++/15/bits/basic_string.tcc:
-
-/usr/include/arpa/inet.h:
-
-/usr/include/c++/15/string_view:
-
-/usr/include/c++/15/bits/postypes.h:
-
-/usr/include/x86_64-linux-gnu/asm/posix_types.h:
+/usr/include/linux/sched/types.h:
 
 /usr/include/c++/15/bits/streambuf.tcc:
 
@@ -598,11 +645,9 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/c++/15/bits/string_view.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/errno.h:
+/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
 
-/usr/include/c++/15/bits/ostream_insert.h:
-
-/usr/include/wctype.h:
+/usr/include/c++/15/bits/unique_ptr.h:
 
 /usr/include/linux/close_range.h:
 
@@ -626,6 +671,12 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/c++/15/concepts:
 
+/usr/include/c++/15/cstdint:
+
+/usr/include/x86_64-linux-gnu/sys/cdefs.h:
+
+/usr/include/c++/15/system_error:
+
 /usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
@@ -643,6 +694,10 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 /usr/include/c++/15/bits/functional_hash.h:
 
 /usr/include/c++/15/ext/type_traits.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h:
+
+/usr/include/c++/15/ctime:
 
 /usr/include/c++/15/bits/stl_function.h:
 
@@ -664,9 +719,13 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/c++/15/ios:
 
+/usr/include/x86_64-linux-gnu/bits/libc-header-start.h:
+
+/usr/include/c++/15/ratio:
+
 /usr/include/c++/15/iosfwd:
 
-/usr/include/c++/15/new:
+/usr/include/c++/15/limits:
 
 /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h:
 
@@ -682,15 +741,13 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 
 /usr/include/c++/15/string:
 
-/usr/include/x86_64-linux-gnu/sys/cdefs.h:
+/usr/include/c++/15/new:
 
-/usr/include/c++/15/system_error:
+/usr/include/c++/15/thread:
 
 /usr/include/x86_64-linux-gnu/c++/15/bits/gthr-default.h:
 
 /usr/include/linux/posix_types.h:
-
-/usr/include/linux/sched/types.h:
 
 /usr/include/linux/stddef.h:
 
@@ -711,21 +768,3 @@ CMakeFiles/echo_client.dir/src/echo_client.cpp.o:
 /usr/lib/gcc/x86_64-linux-gnu/15/crtbeginS.o:
 
 /usr/include/sched.h:
-
-/usr/include/stdio.h:
-
-/usr/include/x86_64-linux-gnu/asm/socket.h:
-
-/usr/include/stdlib.h:
-
-/usr/include/time.h:
-
-/usr/include/x86_64-linux-gnu/sys/select.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
-
-/usr/include/unistd.h:
-
-/usr/include/c++/15/bits/ios_base.h:
-
-/usr/include/wchar.h:

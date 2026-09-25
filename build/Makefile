@@ -129,55 +129,29 @@ kvstore/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/build
 .PHONY : kvstore/fast
 
-#=============================================================================
-# Target rules for targets named echo_client
-
-# Build rule for target.
-echo_client: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 echo_client
-.PHONY : echo_client
-
-# fast build rule for target.
-echo_client/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/echo_client.dir/build.make CMakeFiles/echo_client.dir/build
-.PHONY : echo_client/fast
-
-#=============================================================================
-# Target rules for targets named test
-
-# Build rule for target.
-test: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 test
-.PHONY : test
-
-# fast build rule for target.
-test/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/build
-.PHONY : test/fast
-
-src/echo_client.o: src/echo_client.cpp.o
-.PHONY : src/echo_client.o
+src/conn.o: src/conn.cpp.o
+.PHONY : src/conn.o
 
 # target to build an object file
-src/echo_client.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/echo_client.dir/build.make CMakeFiles/echo_client.dir/src/echo_client.cpp.o
-.PHONY : src/echo_client.cpp.o
+src/conn.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/conn.cpp.o
+.PHONY : src/conn.cpp.o
 
-src/echo_client.i: src/echo_client.cpp.i
-.PHONY : src/echo_client.i
+src/conn.i: src/conn.cpp.i
+.PHONY : src/conn.i
 
 # target to preprocess a source file
-src/echo_client.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/echo_client.dir/build.make CMakeFiles/echo_client.dir/src/echo_client.cpp.i
-.PHONY : src/echo_client.cpp.i
+src/conn.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/conn.cpp.i
+.PHONY : src/conn.cpp.i
 
-src/echo_client.s: src/echo_client.cpp.s
-.PHONY : src/echo_client.s
+src/conn.s: src/conn.cpp.s
+.PHONY : src/conn.s
 
 # target to generate assembly for a file
-src/echo_client.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/echo_client.dir/build.make CMakeFiles/echo_client.dir/src/echo_client.cpp.s
-.PHONY : src/echo_client.cpp.s
+src/conn.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/conn.cpp.s
+.PHONY : src/conn.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -209,7 +183,6 @@ src/reactor.o: src/reactor.cpp.o
 # target to build an object file
 src/reactor.cpp.o:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/reactor.cpp.o
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/reactor.cpp.o
 .PHONY : src/reactor.cpp.o
 
 src/reactor.i: src/reactor.cpp.i
@@ -218,7 +191,6 @@ src/reactor.i: src/reactor.cpp.i
 # target to preprocess a source file
 src/reactor.cpp.i:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/reactor.cpp.i
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/reactor.cpp.i
 .PHONY : src/reactor.cpp.i
 
 src/reactor.s: src/reactor.cpp.s
@@ -227,32 +199,7 @@ src/reactor.s: src/reactor.cpp.s
 # target to generate assembly for a file
 src/reactor.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/kvstore.dir/build.make CMakeFiles/kvstore.dir/src/reactor.cpp.s
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/reactor.cpp.s
 .PHONY : src/reactor.cpp.s
-
-src/test.o: src/test.cpp.o
-.PHONY : src/test.o
-
-# target to build an object file
-src/test.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.o
-.PHONY : src/test.cpp.o
-
-src/test.i: src/test.cpp.i
-.PHONY : src/test.i
-
-# target to preprocess a source file
-src/test.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.i
-.PHONY : src/test.cpp.i
-
-src/test.s: src/test.cpp.s
-.PHONY : src/test.s
-
-# target to generate assembly for a file
-src/test.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/test.dir/build.make CMakeFiles/test.dir/src/test.cpp.s
-.PHONY : src/test.cpp.s
 
 # Help Target
 help:
@@ -262,21 +209,16 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... echo_client"
 	@echo "... kvstore"
-	@echo "... test"
-	@echo "... src/echo_client.o"
-	@echo "... src/echo_client.i"
-	@echo "... src/echo_client.s"
+	@echo "... src/conn.o"
+	@echo "... src/conn.i"
+	@echo "... src/conn.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
 	@echo "... src/reactor.o"
 	@echo "... src/reactor.i"
 	@echo "... src/reactor.s"
-	@echo "... src/test.o"
-	@echo "... src/test.i"
-	@echo "... src/test.s"
 .PHONY : help
 
 

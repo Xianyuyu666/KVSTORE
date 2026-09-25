@@ -5,9 +5,12 @@
 #include <unistd.h>
 #include <cerrno>
 #include <sys/epoll.h>
+#include "kvstore/net/conn.h"
 #include "kvstore/net/reactor.h"
 
 constexpr int PORT = 8888;
+
+std::unordered_map<int, Conn> Conns;
 
 void set_nonblocking(int fd)
 {
@@ -42,23 +45,62 @@ int main()
             }
             std::cout << "新连接：fd = " << conn_fd << std::endl;
             set_nonblocking(conn_fd);
-            T.add_fd(conn_fd,EPOLLIN,[](int fd,uint32_t event){
-                (void)event;
-                char msg[4096];
-                while(true){
-                    ssize_t r = read(fd,msg,sizeof(msg));
-                    if(r > 0){
-                        write(fd,msg,r);
-                    }
-                    else if(r == 0){
-                        close(fd);
-                        break;
-                    }
-                    else{
-                        if(errno != EAGAIN){
-                            close(fd);
+            Conns.emplace(conn_fd,Conn(conn_fd));
+            T.add_fd(conn_fd,EPOLLIN,[&T](int conn_fd,uint32_t event){
+                //读模块
+                if(event & EPOLLIN){
+                    while(true){
+                        char tmp[MAX_SIZE];
+                        ssize_t r = read(conn_fd,tmp,MAX_SIZE);
+                        if(r > 0){
+                            Conns.at(conn_fd).Read_append(tmp,r);
                         }
-                        break;
+                        else if(r == 0){
+                            T.del_fd(conn_fd);
+                            close(conn_fd);
+                            Conns.erase(conn_fd);
+                            return;
+                        }
+                        else{
+                            if(errno == EAGAIN)break;
+                            T.del_fd(conn_fd);
+                            close(conn_fd);
+                            Conns.erase(conn_fd);
+                            return;
+                        }
+                    }
+                    std::string frame;
+                    while(Conns.at(conn_fd).try_pop_frame(frame)){
+                        Conns.at(conn_fd).Write_append(frame.data(),frame.size());
+                    }
+                    if(Conns.at(conn_fd).Get_write_buf().size()){
+                        T.mod_fd(conn_fd,EPOLLOUT | EPOLLIN);
+                    }
+                }
+                //写模块
+                if(event & EPOLLOUT){
+                    while(true){
+                        int s = write(conn_fd,Conns.at(conn_fd).Get_write_buf().data(),Conns.at(conn_fd).Get_write_buf().size());
+                        if(s > 0){
+                            Conns.at(conn_fd).Get_write_buf().erase(0,s);
+                        }
+                        if(s == 0){
+                            close(conn_fd);
+                            T.del_fd(conn_fd);
+                            Conns.erase(conn_fd);
+                            return;
+                        }
+                        if(s < 0){
+                            if(errno == EAGAIN)break;
+                            close(conn_fd);
+                            T.del_fd(conn_fd);
+                            Conns.erase(conn_fd);
+                            return;
+                        }
+                        if(Conns.at(conn_fd).Get_write_buf().empty()){
+                            T.mod_fd(conn_fd,EPOLLIN);
+                            break;
+                        }
                     }
                 }
             });

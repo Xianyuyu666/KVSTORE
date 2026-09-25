@@ -6,6 +6,7 @@ test: \
   /usr/lib/gcc/x86_64-linux-gnu/15/libasan.so \
   CMakeFiles/test.dir/src/test.cpp.o \
   CMakeFiles/test.dir/src/reactor.cpp.o \
+  CMakeFiles/test.dir/src/conn.cpp.o \
   /usr/lib/gcc/x86_64-linux-gnu/15/libstdc++.so \
   /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/libm.so \
   /usr/lib/gcc/x86_64-linux-gnu/15/../../../x86_64-linux-gnu/libm.so \
@@ -47,6 +48,8 @@ test: \
 CMakeFiles/test.dir/src/test.cpp.o:
 
 CMakeFiles/test.dir/src/reactor.cpp.o:
+
+CMakeFiles/test.dir/src/conn.cpp.o:
 
 /usr/lib/gcc/x86_64-linux-gnu/15/libstdc++.so:
 

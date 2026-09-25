@@ -5,9 +5,9 @@
 #include <unistd.h>
 #include <cerrno>
 #include <sys/epoll.h>
+#include "kvstore/net/reactor.h"
 
 constexpr int PORT = 8888;
-constexpr int MAX_EVENTS = 1024;
 
 void set_nonblocking(int fd)
 {
@@ -30,83 +30,40 @@ int main()
     listen(listen_fd, 128);
     // 设置非阻塞
     set_nonblocking(listen_fd);
-    // epoll实例
-    int epfd = epoll_create1(0);
-    epoll_event ev{};
-    ev.events = EPOLLIN;
-    ev.data.fd = listen_fd;
-    epoll_ctl(epfd, EPOLL_CTL_ADD, listen_fd, &ev);
 
-    std::cout << "服务器已启动..." << std::endl;
-
-    // 事件循环
-    epoll_event events[MAX_EVENTS];
-    while (true)
-    {
-        int n = epoll_wait(epfd, events, MAX_EVENTS, -1);
-        for (int i = 0; i < n; i++)
-        {
-            int fd = events[i].data.fd;
-            uint32_t e = events[i].events;
-
-            // 监听fd被唤醒->有新连接connect
-            if (fd == listen_fd)
-            {
-                while (true)
-                {
-                    int conn_fd = accept(fd, nullptr, nullptr);
-                    if (conn_fd == -1)
-                    {
-                        if (errno == EAGAIN || errno == EWOULDBLOCK)
-                            break;
-                        else
-                        {
-                            perror("accept error");
-                            exit(1);
+    Reactor T{};
+    T.add_fd(listen_fd, EPOLLIN, [&T](int fd, uint32_t event)
+             {
+                (void)event;
+        while(true){
+            int conn_fd = accept(fd,nullptr,nullptr);
+            if(conn_fd == -1){
+                break;
+            }
+            std::cout << "新连接：fd = " << conn_fd << std::endl;
+            set_nonblocking(conn_fd);
+            T.add_fd(conn_fd,EPOLLIN,[](int fd,uint32_t event){
+                (void)event;
+                char msg[4096];
+                while(true){
+                    ssize_t r = read(fd,msg,sizeof(msg));
+                    if(r > 0){
+                        write(fd,msg,r);
+                    }
+                    else if(r == 0){
+                        close(fd);
+                        break;
+                    }
+                    else{
+                        if(errno != EAGAIN){
+                            close(fd);
                         }
-                    }
-                    // 设置非阻塞
-                    set_nonblocking(conn_fd);
-                    // 打包事件加入事件循环
-                    epoll_event cev{};
-                    cev.events = EPOLLIN;
-                    cev.data.fd = conn_fd;
-                    epoll_ctl(epfd, EPOLL_CTL_ADD, conn_fd, &cev);
-                    std::cout << "新连接：fd = " << conn_fd << std::endl;
-                }
-                continue;
-            }
-            if (e & (EPOLLERR | EPOLLHUP))
-            {
-                close(fd);
-                continue;
-            }
-            if (e & EPOLLIN)
-            {
-                char tmp[4096];
-                while (true)
-                {
-                    ssize_t r = read(fd, tmp, sizeof(tmp));
-                    if (r > 0)
-                    {
-                        write(fd, tmp, r);
-                    }
-                    else if (r == 0)
-                    {
-                        std::cout << "关闭：fd = " << fd << std::endl;
-                        close(fd);
-                        break;
-                    }
-                    else
-                    {
-                        if (errno == EAGAIN)
-                            break;
-                        close(fd);
                         break;
                     }
                 }
-            }
-        }
-    }
+            });
+        } });
+    std::cout << "服务器已启动..." << std::endl;
+    T.loop();
     return 0;
 }
