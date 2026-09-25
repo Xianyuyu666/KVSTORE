@@ -1,0 +1,1 @@
+/usr/bin/c++ -fsanitize=address -fno-omit-frame-pointer -g -fsanitize=address -Wl,--dependency-file=CMakeFiles/kvstore.dir/link.d CMakeFiles/kvstore.dir/src/main.cpp.o -o kvstore

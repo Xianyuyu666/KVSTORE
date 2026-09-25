@@ -1,0 +1,1 @@
+/usr/bin/c++ -fsanitize=address -fno-omit-frame-pointer -g -fsanitize=address -Wl,--dependency-file=CMakeFiles/echo_client.dir/link.d CMakeFiles/echo_client.dir/src/echo_client.cpp.o -o echo_client

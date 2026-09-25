@@ -1,0 +1,4 @@
+/home/ailu_dickcd/kvstore/build/CMakeFiles/kvstore.dir
+/home/ailu_dickcd/kvstore/build/CMakeFiles/echo_client.dir
+/home/ailu_dickcd/kvstore/build/CMakeFiles/edit_cache.dir
+/home/ailu_dickcd/kvstore/build/CMakeFiles/rebuild_cache.dir
