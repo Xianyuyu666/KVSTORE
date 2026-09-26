@@ -1,3 +1,5 @@
 /home/ailu_dickcd/kvstore/build/CMakeFiles/kvstore.dir
+/home/ailu_dickcd/kvstore/build/CMakeFiles/test.dir
+/home/ailu_dickcd/kvstore/build/CMakeFiles/f.dir
 /home/ailu_dickcd/kvstore/build/CMakeFiles/edit_cache.dir
 /home/ailu_dickcd/kvstore/build/CMakeFiles/rebuild_cache.dir

@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <string>
 
-constexpr int MAX_SIZE = 4096;  //一次read最大字节数
+constexpr int MAX_SIZE = 1028;  //一次read最大4字节长度头+1024KB数据
 
 //生命周期由Reactor管理，accept时创建，连接关闭销毁
 class Conn{

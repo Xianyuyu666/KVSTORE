@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <cerrno>
 #include <sys/epoll.h>
+#include <csignal>
 #include "kvstore/net/conn.h"
 #include "kvstore/net/reactor.h"
 
@@ -19,6 +20,7 @@ void set_nonblocking(int fd)
 
 int main()
 {
+    signal(SIGPIPE,SIG_IGN);
     // 创建监听fd
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     // 设置地址复用
