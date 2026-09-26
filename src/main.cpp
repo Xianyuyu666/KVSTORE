@@ -21,7 +21,7 @@ void set_nonblocking(int fd)
 
 int main()
 {
-    signal(SIGPIPE,SIG_IGN);
+    signal(SIGPIPE, SIG_IGN);
     // 创建监听fd
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
     // 设置地址复用
@@ -46,7 +46,7 @@ int main()
             if(conn_fd == -1){
                 break;
             }
-            std::cout << "新连接：fd = " << conn_fd << std::endl;
+            Log(LOG_INFO,"new acception fd = %d",conn_fd);
             set_nonblocking(conn_fd);
             Conns.emplace(conn_fd,Conn(conn_fd));
             T.add_fd(conn_fd,EPOLLIN,[&T](int conn_fd,uint32_t event){
@@ -57,24 +57,31 @@ int main()
                         ssize_t r = read(conn_fd,tmp,MAX_SIZE);
                         if(r > 0){
                             Conns.at(conn_fd).Read_append(tmp,r);
+                            Log(LOG_INFO,"[fd=%d] read %d bytes massage read_buf %zu bytes rest",conn_fd, r,Conns.at(conn_fd).Get_read_buf().size());
                         }
                         else if(r == 0){
                             T.del_fd(conn_fd);
                             close(conn_fd);
                             Conns.erase(conn_fd);
+                            Log(LOG_INFO,"[fd=%d] read done",conn_fd);
                             return;
                         }
                         else{
-                            if(errno == EAGAIN)break;
+                            if(errno == EAGAIN){
+                                Log(LOG_INFO,"[fd=%d] read EAGAIN",conn_fd);
+                                break;
+                            }
                             T.del_fd(conn_fd);
                             close(conn_fd);
                             Conns.erase(conn_fd);
+                            Log(LOG_ERROR,"[fd=%d] read error",conn_fd);
                             return;
                         }
                     }
                     std::string frame;
                     while(Conns.at(conn_fd).try_pop_frame(frame)){
                         Conns.at(conn_fd).Write_append(frame.data(),frame.size());
+                        Log(LOG_INFO,"[fd=%d] pop frame len = %zu read_buf=%zu",conn_fd,frame.size(),Conns.at(conn_fd).Get_read_buf().size());
                     }
                     if(Conns.at(conn_fd).Get_write_buf().size()){
                         T.mod_fd(conn_fd,EPOLLOUT | EPOLLIN);
@@ -86,15 +93,20 @@ int main()
                         int s = write(conn_fd,Conns.at(conn_fd).Get_write_buf().data(),Conns.at(conn_fd).Get_write_buf().size());
                         if(s > 0){
                             Conns.at(conn_fd).Get_write_buf().erase(0,s);
+                            Log(LOG_INFO,"[fd=%d] write %d bytes write_buf %zu bytes rest",conn_fd,s,Conns.at(conn_fd).Get_write_buf().size());
                         }
                         if(s == 0){
                             close(conn_fd);
                             T.del_fd(conn_fd);
                             Conns.erase(conn_fd);
+                            Log(LOG_INFO,"[fd=%d] write done",conn_fd);
                             return;
                         }
                         if(s < 0){
-                            if(errno == EAGAIN)break;
+                            if(errno == EAGAIN){
+                                Log(LOG_INFO,"[fd=%d] write EAGAIN write_buf = %zu bytes left",conn_fd,Conns.at(conn_fd).Get_write_buf().size());
+                                break;
+                            }
                             close(conn_fd);
                             T.del_fd(conn_fd);
                             Conns.erase(conn_fd);
@@ -108,7 +120,7 @@ int main()
                 }
             });
         } });
-    Log(LOG_INFO,"server started on port %d",PORT);
+    Log(LOG_INFO, "[fd=%d]server started on port %d", listen_fd, PORT);
     T.loop();
     return 0;
 }

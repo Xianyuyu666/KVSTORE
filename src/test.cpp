@@ -1,126 +1,13 @@
+#include "kvstore/conc/thread_pool.h"
 #include <iostream>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <cerrno>
-#include <sys/epoll.h>
-#include <csignal>
-#include "kvstore/util/logger.h"
-#include "kvstore/net/conn.h"
-#include "kvstore/net/reactor.h"
 
-constexpr int PORT = 8888;
 
-std::unordered_map<int, Conn> Conns;
-
-void set_nonblocking(int fd)
-{
-    fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
-}
-
-int main()
-{
-    signal(SIGPIPE, SIG_IGN);
-    // 创建监听fd
-    int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
-    // 设置地址复用
-    int opt = 1;
-    setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-
-    sockaddr_in addr{};
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(PORT);
-    addr.sin_addr.s_addr = INADDR_ANY;
-    bind(listen_fd, (sockaddr *)&addr, sizeof(addr));
-    listen(listen_fd, 128);
-    // 设置非阻塞
-    set_nonblocking(listen_fd);
-
-    Reactor T{};
-    T.add_fd(listen_fd, EPOLLIN, [&T](int fd, uint32_t event)
-             {
-                (void)event;
-        while(true){
-            int conn_fd = accept(fd,nullptr,nullptr);
-            if(conn_fd == -1){
-                break;
-            }
-            Log(LOG_INFO,"new acception fd = %d",conn_fd);
-            set_nonblocking(conn_fd);
-            Conns.emplace(conn_fd,Conn(conn_fd));
-            T.add_fd(conn_fd,EPOLLIN,[&T](int conn_fd,uint32_t event){
-                //读模块
-                if(event & EPOLLIN){
-                    while(true){
-                        char tmp[MAX_SIZE];
-                        ssize_t r = read(conn_fd,tmp,MAX_SIZE);
-                        if(r > 0){
-                            Conns.at(conn_fd).Read_append(tmp,r);
-                            Log(LOG_INFO,"[fd=%d] read %d bytes massage read_buf %zu bytes rest",conn_fd, r,Conns.at(conn_fd).Get_read_buf().size());
-                        }
-                        else if(r == 0){
-                            T.del_fd(conn_fd);
-                            close(conn_fd);
-                            Conns.erase(conn_fd);
-                            Log(LOG_INFO,"[fd=%d] read done",conn_fd);
-                            return;
-                        }
-                        else{
-                            if(errno == EAGAIN){
-                                Log(LOG_INFO,"[fd=%d] read EAGAIN",conn_fd);
-                                break;
-                            }
-                            T.del_fd(conn_fd);
-                            close(conn_fd);
-                            Conns.erase(conn_fd);
-                            Log(LOG_ERROR,"[fd=%d] read error",conn_fd);
-                            return;
-                        }
-                    }
-                    std::string frame;
-                    while(Conns.at(conn_fd).try_pop_frame(frame)){
-                        Conns.at(conn_fd).Write_append(frame.data(),frame.size());
-                        Log(LOG_INFO,"[fd=%d] pop frame len = %zu read_buf=%zu",conn_fd,frame.size(),Conns.at(conn_fd).Get_read_buf().size());
-                    }
-                    if(Conns.at(conn_fd).Get_write_buf().size()){
-                        T.mod_fd(conn_fd,EPOLLOUT | EPOLLIN);
-                    }
-                }
-                //写模块
-                if(event & EPOLLOUT){
-                    while(true){
-                        int s = write(conn_fd,Conns.at(conn_fd).Get_write_buf().data(),Conns.at(conn_fd).Get_write_buf().size());
-                        if(s > 0){
-                            Conns.at(conn_fd).Get_write_buf().erase(0,s);
-                            Log(LOG_INFO,"[fd=%d] write %d bytes write_buf %zu bytes rest",conn_fd,s,Conns.at(conn_fd).Get_write_buf().size());
-                        }
-                        if(s == 0){
-                            close(conn_fd);
-                            T.del_fd(conn_fd);
-                            Conns.erase(conn_fd);
-                            Log(LOG_INFO,"[fd=%d] write done",conn_fd);
-                            return;
-                        }
-                        if(s < 0){
-                            if(errno == EAGAIN){
-                                Log(LOG_INFO,"[fd=%d] write EAGAIN write_buf = %zu bytes left",conn_fd,Conns.at(conn_fd).Get_write_buf().size());
-                                break;
-                            }
-                            close(conn_fd);
-                            T.del_fd(conn_fd);
-                            Conns.erase(conn_fd);
-                            return;
-                        }
-                        if(Conns.at(conn_fd).Get_write_buf().empty()){
-                            T.mod_fd(conn_fd,EPOLLIN);
-                            break;
-                        }
-                    }
-                }
-            });
-        } });
-    Log(LOG_INFO, "[fd=%d]server started on port %d", listen_fd, PORT);
-    T.loop();
-    return 0;
+int main(){
+    ThreadPool pool((size_t)4);
+    for(int i = 0;i < 100;i++){
+        pool.submit([i](){
+            std::cout << "线程 " << std::this_thread::get_id() << " 执行任务"
+            << i << std::endl; 
+        });
+    }
 }

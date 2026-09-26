@@ -21,7 +21,7 @@ void Reactor::del_fd(int fd)
 {
     epoll_ctl(epfd, EPOLL_CTL_DEL, fd, nullptr);
     Callbacks.erase(fd);
-    Log(LOG_INFO, "delete fd = %d",fd);
+    Log(LOG_INFO, "delete fd = %d", fd);
 }
 
 void Reactor::mod_fd(int fd, uint32_t event)
@@ -30,7 +30,7 @@ void Reactor::mod_fd(int fd, uint32_t event)
     ev.data.fd = fd;
     ev.events = event;
     epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev);
-    Log(LOG_INFO, "modify fd = %d event = %s",fd,EpollEventtoString(event).c_str());
+    Log(LOG_INFO, "modify fd = %d event = %s", fd, EpollEventtoString(event).c_str());
 }
 
 void Reactor::loop()
