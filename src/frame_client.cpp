@@ -44,15 +44,17 @@ int main(){
         write(fd,msg.data(),msg.size());
         std::string ans,rp_msg;
         ans.resize(65540);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         recv(fd, ans.data(), 65540, MSG_WAITALL);  
         recv_frame(rp_msg,ans);
-        std::cout << "收到回复字节数：（不包含长度头）" << rp_msg.size() << std::endl;
+        std::cout << "收到回复字节数:" << rp_msg.size() << std::endl;
     }
     if(opt == 'b'){
         std::cout << "split" << std::endl;
         write(fd,&len,sizeof(len));
         for(int i = 0;i < 64;i++){
             write(fd,msg.data() + i * 1024,1024);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
         std::string ans,rp_msg;
         ans.resize(65540);
@@ -61,15 +63,18 @@ int main(){
         std::cout << "收到回复字节数：" << rp_msg.size() << std::endl;
     }
     if(opt == 'c'){
+        int n = 1;
         std::cout << "c" << std::endl;
-        for(int i = 0;i < 64;i++){
+        for(int i = 0;i < n;i++){
             uint32_t L = htonl(1024);
             write(fd,&L,sizeof(L));
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             write(fd,msg.data() + i * 1024,1024);
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
         std::string ans,rp_msg;
-        ans.resize(65792);
-        recv(fd,ans.data(),65792,MSG_WAITALL);
+        ans.resize(1028 * n);
+        recv(fd,ans.data(),1028 * n,MSG_WAITALL);
         recv_frame(rp_msg,ans);
         std::cout << "收到回复字节数：" << rp_msg.size() << std::endl;
     }

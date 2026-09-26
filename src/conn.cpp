@@ -14,6 +14,10 @@ std::string& Conn::Get_write_buf(){
     return write_buf;
 }
 
+std::string& Conn::Get_read_buf(){
+    return read_buf;
+}
+
 bool Conn::try_pop_frame(std::string& frame){
     if(read_buf.size() < 4)return false;
     uint32_t len;

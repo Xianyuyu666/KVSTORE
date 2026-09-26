@@ -3,6 +3,7 @@
 #include <functional>
 #include <cstdint>
 #include <sys/epoll.h>
+#include <string>
 
 constexpr int MAX_EVENTS = 1024;
 using Callback_func = std::function<void(int fd, uint32_t event)>;
@@ -18,6 +19,9 @@ public:
     void mod_fd(int fd,uint32_t event);
     //事件循环
     void loop();
+
+    //epoll事件掩码转字符串，供日志打印
+    std::string EpollEventtoString(uint32_t e);
 
 
 private:

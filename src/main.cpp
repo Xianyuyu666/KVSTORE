@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <sys/epoll.h>
 #include <csignal>
+#include "kvstore/util/logger.h"
 #include "kvstore/net/conn.h"
 #include "kvstore/net/reactor.h"
 
@@ -107,7 +108,7 @@ int main()
                 }
             });
         } });
-    std::cout << "服务器已启动..." << std::endl;
+    Log(LOG_INFO,"server started on port %d",PORT);
     T.loop();
     return 0;
 }
