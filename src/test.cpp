@@ -12,14 +12,15 @@
 #include "kvstore/net/conn.h"
 #include "kvstore/net/reactor.h"
 #include "kvstore/conc/thread_pool.h"
+#include "kvstore/store/store.h"
 
 constexpr int PORT = 8888;
 
 ThreadPool pool(4);
-std::mutex resp_mtx; // 保护响应队列
-std::queue<std::pair<int, std::string>> resp_queue;
-
-std::unordered_map<int, Conn> Conns;
+std::mutex resp_mtx;                                // 保护响应队列
+std::queue<std::pair<int, std::string>> resp_queue; // 响应队列
+std::unordered_map<int, Conn> Conns;                // 缓冲区
+Store S;
 
 void set_nonblocking(int fd)
 {
@@ -28,7 +29,34 @@ void set_nonblocking(int fd)
 
 std::string handle_frame(const std::string &frame)
 {
-    return frame;
+    std::string opt, key, value;
+    std::stringstream ss(frame);
+    ss >> opt;
+    if((opt == "get" || opt == "set" || opt == "del") && !(ss >> key))return "ERR 参数不足:缺少key";
+    if (opt == "set")
+    {
+        ss.ignore();
+        if(!getline(ss,value))return "ERR 参数不足:缺少value";
+        S.Set(key,value);
+        return "OK";
+    }
+    else if (opt == "get")
+    {
+        if (S.Get(key, value))
+        {
+            return value;
+        }
+        return "NIL";
+    }
+    else if (opt == "del")
+    {
+        if (S.Del(key))
+        {
+            return "OK";
+        }
+        return "NIL";
+    }
+    return "ERR 未知命令";
 }
 
 int main()
@@ -66,7 +94,7 @@ int main()
         }
         for(auto& [fd,msg] : batch){
             if(Conns.count(fd)){
-                Conns.at(fd).Write_append(msg.data(),msg.size());
+                Conns.at(fd).Write_frame(msg);
                 Log(LOG_INFO,"[fd=%d] write_buf %d bytes rest",fd,Conns.at(fd).Get_write_buf().size());
                 T.mod_fd(fd,EPOLLOUT | EPOLLIN);
             }

@@ -16,9 +16,11 @@ add_compile_options(-Wall -Wextra -Wpedantic) # 更多警告
 set(CMAKE_CXX_FLAGS_DEBUG "-fsanitize=address -fno-omit-frame-pointer -g")
 set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-fsanitize=address")
 
-add_executable(test src/test.cpp src/thread_pool.cpp src/reactor.cpp src/conn.cpp src/logger.cpp)
-add_executable(f src/frame_client.cpp)
+add_executable(t src/test.cpp src/reactor.cpp src/store.cpp src/logger.cpp src/conn.cpp src/thread_pool.cpp)
+add_executable(c src/client_test.cpp)
+add_executable(m src/main.cpp src/store.cpp)
 
-target_include_directories(test PRIVATE include)
+target_include_directories(m PRIVATE include)
+target_include_directories(t PRIVATE include)
 
 

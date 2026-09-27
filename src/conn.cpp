@@ -22,6 +22,12 @@ std::string &Conn::Get_read_buf()
     return read_buf;
 }
 
+void Conn::Write_frame(const std::string body){
+    uint32_t len = htonl(body.size());
+    write_buf.append(reinterpret_cast<const char*>(&len),4);
+    write_buf.append(body.c_str(),body.size());
+}
+
 bool Conn::try_pop_frame(std::string &frame)
 {
     if (read_buf.size() < 4)
@@ -31,7 +37,7 @@ bool Conn::try_pop_frame(std::string &frame)
     len = ntohl(len);
     if (read_buf.size() >= 4 + len)
     {
-        frame = read_buf.substr(0, 4 + len);
+        frame = read_buf.substr(4,len);
         read_buf.erase(0, 4 + len);
         return true;
     }

@@ -15,6 +15,7 @@ class Conn{
     bool try_pop_frame(std::string& frame);
     void Read_append(const char * tmp,int size);
     void Write_append(const char * tmp,int size);
+    void Write_frame(const std::string body);
     std::string& Get_write_buf();
     std::string& Get_read_buf();
 
