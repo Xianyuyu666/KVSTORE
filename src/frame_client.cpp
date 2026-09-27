@@ -8,79 +8,89 @@
 #include <unistd.h>
 
 constexpr int PORT = 8888;
-constexpr int chunk = 1024; //一次发送1KB
+constexpr int chunk = 1024; // 一次发送1KB
 
-void recv_frame(std::string& rp_msg,std::string& ans){
-    while(ans.size() >= 4){
+void recv_frame(std::string &rp_msg, std::string &ans)
+{
+    while (ans.size() >= 4)
+    {
         uint32_t len;
-        memcpy(&len,ans.data(),4);
+        memcpy(&len, ans.data(), 4);
         len = ntohl(len);
-        rp_msg.append(ans.substr(4,len));
-        ans.erase(0,4 + len);
+        rp_msg.append(ans.substr(4, len));
+        ans.erase(0, 4 + len);
     }
 }
 
-int main(){
-    int fd = socket(AF_INET,SOCK_STREAM,0);
-    
+int main()
+{
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
+
     sockaddr_in addr{};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(PORT);
-    inet_pton(AF_INET,"127.0.0.1",&addr.sin_addr.s_addr);
+    inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr.s_addr);
 
-    if(connect(fd,(sockaddr *)&addr,sizeof(addr)) == -1){
+    if (connect(fd, (sockaddr *)&addr, sizeof(addr)) == -1)
+    {
         perror("connect");
         exit(1);
     }
 
     char opt;
     std::cin >> opt;
-    std::string msg(65536,'A');
+    std::string msg(65536, 'A');
     uint32_t len = htonl(65536);
-    //big测试
-    if(opt == 'a'){
+    // big测试
+    if (opt == 'a')
+    {
         std::cout << "big" << std::endl;
-        write(fd,&len,sizeof(len));
-        write(fd,msg.data(),msg.size());
-        std::string ans,rp_msg;
+        write(fd, &len, sizeof(len));
+        write(fd, msg.data(), msg.size());
+        std::string ans, rp_msg;
         ans.resize(65540);
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-        recv(fd, ans.data(), 65540, MSG_WAITALL);  
-        recv_frame(rp_msg,ans);
+        recv(fd, ans.data(), 65540, MSG_WAITALL);
+        recv_frame(rp_msg, ans);
         std::cout << "收到回复字节数:" << rp_msg.size() << std::endl;
     }
-    if(opt == 'b'){
+    if (opt == 'b')
+    {
         std::cout << "split" << std::endl;
-        write(fd,&len,sizeof(len));
-        for(int i = 0;i < 64;i++){
-            write(fd,msg.data() + i * 1024,1024);
+        write(fd, &len, sizeof(len));
+        for (int i = 0; i < 64; i++)
+        {
+            write(fd, msg.data() + i * 1024, 1024);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
-        std::string ans,rp_msg;
+        std::string ans, rp_msg;
         ans.resize(65540);
-        recv(fd,ans.data(),65540, MSG_WAITALL);
-        recv_frame(rp_msg,ans);
+        recv(fd, ans.data(), 65540, MSG_WAITALL);
+        recv_frame(rp_msg, ans);
         std::cout << "收到回复字节数：" << rp_msg.size() << std::endl;
     }
-    if(opt == 'c'){
+    if (opt == 'c')
+    {
         int n = 1;
         std::cout << "c" << std::endl;
-        for(int i = 0;i < n;i++){
+        for (int i = 0; i < n; i++)
+        {
             uint32_t L = htonl(1024);
-            write(fd,&L,sizeof(L));
+            write(fd, &L, sizeof(L));
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            write(fd,msg.data() + i * 1024,1024);
+            write(fd, msg.data() + i * 1024, 1024);
             std::this_thread::sleep_for(std::chrono::milliseconds(500));
         }
-        std::string ans,rp_msg;
+        std::string ans, rp_msg;
         ans.resize(1028 * n);
-        recv(fd,ans.data(),1028 * n,MSG_WAITALL);
-        recv_frame(rp_msg,ans);
+        recv(fd, ans.data(), 1028 * n, MSG_WAITALL);
+        recv_frame(rp_msg, ans);
         std::cout << "收到回复字节数：" << rp_msg.size() << std::endl;
     }
-    if(opt == 'd'){
+    if (opt == 'd')
+    {
         std::cout << "d" << std::endl;
-        write(fd,&len,sizeof(len));
+        write(fd, &len, sizeof(len));
         close(fd);
     }
     return 0;
