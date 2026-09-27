@@ -4,14 +4,20 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <cerrno>
+#include <sstream>
 #include <sys/epoll.h>
 #include <csignal>
 #include <sys/eventfd.h>
 #include "kvstore/util/logger.h"
 #include "kvstore/net/conn.h"
 #include "kvstore/net/reactor.h"
+#include "kvstore/conc/thread_pool.h"
 
 constexpr int PORT = 8888;
+
+ThreadPool pool(4);
+std::mutex resp_mtx; // 保护响应队列
+std::queue<std::pair<int, std::string>> resp_queue;
 
 std::unordered_map<int, Conn> Conns;
 
@@ -45,13 +51,30 @@ int main()
 
     Reactor T{};
     int evfd = eventfd(0, O_NONBLOCK);
-    T.add_fd(evfd, EPOLLIN, [](int fd, uint32_t)
+    T.add_fd(evfd, EPOLLIN, [&T](int fd, uint32_t)
              {
         uint64_t r;
-        read(fd,&r,sizeof(r)); });
-    T.add_fd(listen_fd, EPOLLIN, [&T](int fd, uint32_t event)
+        read(fd,&r,sizeof(r));
+        Log(LOG_INFO,"[fd=%d] 回调函数,事件类型：EPOLLIN",fd);
+        std::vector<std::pair<int,std::string>>batch;
+        {
+            std::lock_guard<std::mutex> lk(resp_mtx);
+            while(!resp_queue.empty()){
+                batch.push_back(resp_queue.front());
+                resp_queue.pop();
+            }
+        }
+        for(auto& [fd,msg] : batch){
+            if(Conns.count(fd)){
+                Conns.at(fd).Write_append(msg.data(),msg.size());
+                Log(LOG_INFO,"[fd=%d] write_buf %d bytes rest",fd,Conns.at(fd).Get_write_buf().size());
+                T.mod_fd(fd,EPOLLOUT | EPOLLIN);
+            }
+        } });
+    T.add_fd(listen_fd, EPOLLIN, [&T, evfd](int fd, uint32_t event)
              {
         (void)event;
+        Log(LOG_INFO,"[fd=%d] 回调函数,事件类型：%s",fd,T.EpollEventtoString(event).c_str());
         while (true)
         {
             int conn_fd = accept(fd, nullptr, nullptr);
@@ -62,7 +85,8 @@ int main()
             Log(LOG_INFO, "new acception fd = %d", conn_fd);
             set_nonblocking(conn_fd);
             Conns.emplace(conn_fd, Conn(conn_fd));
-            T.add_fd(conn_fd,EPOLLIN,[&T](int conn_fd,uint32_t event){
+            T.add_fd(conn_fd,EPOLLIN,[&T,evfd](int conn_fd,uint32_t event){
+                Log(LOG_INFO,"[fd=%d] 回调函数,事件类型：%s",conn_fd,T.EpollEventtoString(event).c_str());
                 // 读模块
                 if (event & EPOLLIN)
                 {
@@ -100,12 +124,18 @@ int main()
                     std::string frame;
                     while (Conns.at(conn_fd).try_pop_frame(frame))
                     {
-                        std::string resp = handle_frame(frame);
-                        Conns.at(conn_fd).Write_append(resp.data(),resp.size());
-                    }
-                    if (Conns.at(conn_fd).Get_write_buf().size())
-                    {
-                        T.mod_fd(conn_fd, EPOLLOUT | EPOLLIN);
+                        pool.submit([conn_fd,frame,evfd](){
+                            std::string resp = handle_frame(frame);
+                            {
+                                std::lock_guard<std::mutex> lk(resp_mtx);
+                                resp_queue.push({conn_fd,std::move(resp)});
+                            }
+                            std::stringstream ss;
+                            ss << std::this_thread::get_id();
+                            Log(LOG_INFO,"[tid=%s] finished handle_frame",ss.str().c_str());
+                            uint64_t one = 1;
+                            write(evfd,&one,sizeof(one));
+                        });
                     }
                 }
                 //写模块
