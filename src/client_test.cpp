@@ -22,8 +22,24 @@ void recv_frame(std::string &rp_msg, std::string &ans)
     }
 }
 
-int main()
+size_t send_frame(int fd, const std::string &body)
 {
+    uint32_t len = htonl(body.size());
+    write(fd, &len, sizeof(len));
+    return write(fd, body.data(), body.size());
+}
+
+std::string read_msg(int fd)
+{
+    uint32_t len;
+    read(fd, &len, sizeof(len));
+    len = ntohl(len);
+    std::string ans(len, '\0');
+    recv(fd, ans.data(), ans.size(),MSG_WAITALL);
+    return ans;
+}
+
+int Conect(){
     int fd = socket(AF_INET, SOCK_STREAM, 0);
 
     sockaddr_in addr{};
@@ -36,21 +52,65 @@ int main()
         perror("connect");
         exit(1);
     }
+    return fd;
+}
 
-    while(true){
-        std::string msg;
-        getline(std::cin,msg);
-        if(msg == "quit")break;
+int main()
+{
+    int fd = Conect();
+    char opt;
+    std::cin >> opt;
+    if (opt == 'a')
+    {
+        std::string msg(65536, 'a');
+        send_frame(fd, "set name " + msg);
+        auto ans = read_msg(fd);
+        std::cout << "服务器回复：" << ans << std::endl;
+        send_frame(fd, "get name");
+        ans = read_msg(fd);
+        std::cout << ans.size() << std::endl;
+    }
+    if (opt == 'b')
+    {
+        std::string msg(65527, 'a');
+        size_t sent = 0;
+        msg = "set name " + msg;
+        uint32_t len = htonl(msg.size());
+        write(fd, &len, sizeof(len));
+        for (int i = 1; i <= 64; i++)
+        {
+            size_t s = write(fd, msg.data() + sent, 1024);
+            sent += s;
+        }
+        auto ans = read_msg(fd);
+        std::cout << "服务器回复:" << ans << std::endl;
+        send_frame(fd, "get name");
+        ans = read_msg(fd);
+        std::cout << "size = " << ans.size() << std::endl;
+    }
+    if (opt == 'c')
+    {
+        std::string msg(65536,'a');
+        msg = "set name " + msg;
         uint32_t len = htonl(msg.size());
         write(fd,&len,sizeof(len));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         write(fd,msg.data(),msg.size());
-        uint32_t rp_len;
-        read(fd,&rp_len,sizeof(rp_len));
-        rp_len = ntohl(rp_len);
-        std::string rp_msg(rp_len,'\0');
-        read(fd,rp_msg.data(),rp_msg.size());
-        std::cout << "服务器回复：" << rp_msg << std::endl;
+        auto ans = read_msg(fd);
+        std::cout << ">" << ans << std::endl;
+        send_frame(fd,"get name");
+        ans = read_msg(fd);
+        std::cout << "size:" << ans.size() << std::endl;
     }
-    close(fd);
+    if(opt == 'd'){
+        std::string msg(65536, 'a');
+        send_frame(fd, "set name " + msg);
+        close(fd);
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        fd = Conect();
+        send_frame(fd, "get name");
+        auto ans = read_msg(fd);
+        std::cout << ans.size() << std::endl;
+    }
     return 0;
 }

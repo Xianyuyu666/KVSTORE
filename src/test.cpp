@@ -129,6 +129,22 @@ int main()
                         }
                         else if (r == 0)
                         {
+                            //退出时处理缓存里残留数据
+                            std::string frame;
+                            while(Conns.at(conn_fd).try_pop_frame(frame)){
+                                pool.submit([evfd,conn_fd,frame](){
+                                    std::string resp = handle_frame(frame);
+                                    {
+                                        std::lock_guard<std::mutex> lk(resp_mtx);
+                                        resp_queue.push({conn_fd,resp});
+                                    }
+                                    std::stringstream ss;
+                                    ss << std::this_thread::get_id();
+                                    Log(LOG_INFO,"[tid=%s] finished handle_frame",ss.str().c_str());
+                                    uint64_t one = 1;
+                                    write(evfd,&one,sizeof(one));
+                                });
+                            }
                             T.del_fd(conn_fd);
                             close(conn_fd);
                             Conns.erase(conn_fd);
