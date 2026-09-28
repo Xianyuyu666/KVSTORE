@@ -19,8 +19,10 @@ set(CMAKE_EXE_LINKER_FLAGS_DEBUG "-fsanitize=address")
 add_executable(t src/test.cpp src/reactor.cpp src/store.cpp src/logger.cpp src/conn.cpp src/thread_pool.cpp)
 add_executable(c src/client_test.cpp)
 add_executable(m src/test.cpp src/reactor.cpp src/store.cpp src/logger.cpp src/conn.cpp src/thread_pool.cpp)
+add_executable(kt src/kvstore_test.cpp src/store.cpp)
 
 target_include_directories(m PRIVATE include)
 target_include_directories(t PRIVATE include)
+target_include_directories(kt PRIVATE include)
 
 

@@ -15,6 +15,7 @@
 #include "kvstore/store/store.h"
 
 constexpr int PORT = 8888;
+const std::string DATA_PATH = "data.bin";
 
 ThreadPool pool(4);
 std::mutex resp_mtx;                                // 保护响应队列
