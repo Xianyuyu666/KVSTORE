@@ -32,12 +32,14 @@ std::string handle_frame(const std::string &frame)
     std::string opt, key, value;
     std::stringstream ss(frame);
     ss >> opt;
-    if((opt == "get" || opt == "set" || opt == "del") && !(ss >> key))return "ERR 参数不足:缺少key";
+    if ((opt == "get" || opt == "set" || opt == "del") && !(ss >> key))
+        return "ERR 参数不足:缺少key";
     if (opt == "set")
     {
         ss.ignore();
-        if(!getline(ss,value))return "ERR 参数不足:缺少value";
-        S.Set(key,value);
+        if (!getline(ss, value))
+            return "ERR 参数不足:缺少value";
+        S.Set(key, value);
         return "OK";
     }
     else if (opt == "get")
