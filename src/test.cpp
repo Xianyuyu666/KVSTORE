@@ -15,13 +15,19 @@
 #include "kvstore/store/store.h"
 
 constexpr int PORT = 8888;
-const std::string DATA_PATH = "data.bin";
+const std::string DATA_PATH = "kvstore.data";
 
 ThreadPool pool(4);
 std::mutex resp_mtx;                                // 保护响应队列
 std::queue<std::pair<int, std::string>> resp_queue; // 响应队列
 std::unordered_map<int, Conn> Conns;                // 缓冲区
 Store S;
+
+void handle_signal(int sig){
+    Log(LOG_INFO,"收到信号: %d,快照保存退出",sig);
+    S.Save(DATA_PATH);
+    exit(0);
+}
 
 void set_nonblocking(int fd)
 {
@@ -59,11 +65,16 @@ std::string handle_frame(const std::string &frame)
         }
         return "NIL";
     }
+    else if(opt == "show"){
+        return S.showAll();
+    }
     return "ERR 未知命令";
 }
 
 int main()
 {
+    signal(SIGINT,handle_signal);
+    signal(SIGTERM,handle_signal);
     signal(SIGPIPE, SIG_IGN);
     // 创建监听fd
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -79,6 +90,8 @@ int main()
     listen(listen_fd, 128);
     // 设置非阻塞
     set_nonblocking(listen_fd);
+    //加载数据文件
+    S.Load(DATA_PATH);
 
     Reactor T{};
     int evfd = eventfd(0, O_NONBLOCK);
@@ -151,7 +164,8 @@ int main()
                             T.del_fd(conn_fd);
                             close(conn_fd);
                             Conns.erase(conn_fd);
-                            Log(LOG_INFO, "[fd=%d] read done", conn_fd);
+                            S.Save(DATA_PATH);
+                            Log(LOG_INFO, "[fd=%d] 客户端退出,已保存文件", conn_fd);
                             return;
                         }
                         else

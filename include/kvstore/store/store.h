@@ -17,4 +17,5 @@ class Store{
     bool Del(const std::string& key);
     bool Save(std::string path);
     bool Load(std::string path);
+    std::string showAll();
 };
