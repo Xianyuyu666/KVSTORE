@@ -17,14 +17,15 @@
 constexpr int PORT = 8888;
 const std::string DATA_PATH = "kvstore.data";
 
-ThreadPool pool(4);
+ThreadPool pool(6);
 std::mutex resp_mtx;                                // 保护响应队列
 std::queue<std::pair<int, std::string>> resp_queue; // 响应队列
 std::unordered_map<int, Conn> Conns;                // 缓冲区
 Store S;
 
-void handle_signal(int sig){
-    Log(LOG_INFO,"收到信号: %d,快照保存退出",sig);
+void handle_signal(int sig)
+{
+    Log(LOG_INFO, "收到信号: %d,保存退出", sig);
     S.Save(DATA_PATH);
     exit(0);
 }
@@ -32,6 +33,16 @@ void handle_signal(int sig){
 void set_nonblocking(int fd)
 {
     fcntl(fd, F_SETFL, fcntl(fd, F_GETFL, 0) | O_NONBLOCK);
+}
+
+void clear_evfd(int fd){
+    uint64_t r;
+    if (read(fd, &r, sizeof(r)) < 0) { /* evfd 读失败，忽略 */ }
+}
+
+void notify_evfd(int fd){
+    uint64_t one = 1;
+    if (write(fd, &one, sizeof(one)) < 0) { /* evfd 写失败，忽略 */ }
 }
 
 std::string handle_frame(const std::string &frame)
@@ -65,16 +76,25 @@ std::string handle_frame(const std::string &frame)
         }
         return "NIL";
     }
-    else if(opt == "show"){
+    else if (opt == "show")
+    {
         return S.showAll();
     }
     return "ERR 未知命令";
 }
 
-int main()
+int main(int argc, char const *argv[])
 {
-    signal(SIGINT,handle_signal);
-    signal(SIGTERM,handle_signal);
+    // 加载数据
+    S.Load(DATA_PATH);
+    // 禁用日志以提高性能
+    if (argc >= 2 && std::string(argv[1]) == "quiet")
+    {
+        SetLogEnabled(false);
+    }
+    // 信号处理
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
     signal(SIGPIPE, SIG_IGN);
     // 创建监听fd
     int listen_fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -90,15 +110,13 @@ int main()
     listen(listen_fd, 128);
     // 设置非阻塞
     set_nonblocking(listen_fd);
-    //加载数据文件
-    S.Load(DATA_PATH);
 
     Reactor T{};
     int evfd = eventfd(0, O_NONBLOCK);
+    // 注册
     T.add_fd(evfd, EPOLLIN, [&T](int fd, uint32_t)
              {
-        uint64_t r;
-        read(fd,&r,sizeof(r));
+        clear_evfd(fd);
         Log(LOG_INFO,"[fd=%d] 回调函数,事件类型：EPOLLIN",fd);
         std::vector<std::pair<int,std::string>>batch;
         {
@@ -111,7 +129,7 @@ int main()
         for(auto& [fd,msg] : batch){
             if(Conns.count(fd)){
                 Conns.at(fd).Write_frame(msg);
-                Log(LOG_INFO,"[fd=%d] write_buf %d bytes rest",fd,Conns.at(fd).Get_write_buf().size());
+                Log(LOG_INFO,"[fd=%d] write_buf剩余%zu字节",fd,Conns.at(fd).Get_write_buf().size());
                 T.mod_fd(fd,EPOLLOUT | EPOLLIN);
             }
         } });
@@ -126,7 +144,7 @@ int main()
             {
                 break;
             }
-            Log(LOG_INFO, "new acception fd = %d", conn_fd);
+            Log(LOG_INFO, "新连接fd = %d", conn_fd);
             set_nonblocking(conn_fd);
             Conns.emplace(conn_fd, Conn(conn_fd));
             T.add_fd(conn_fd,EPOLLIN,[&T,evfd](int conn_fd,uint32_t event){
@@ -141,7 +159,7 @@ int main()
                         if (r > 0)
                         {
                             Conns.at(conn_fd).Read_append(tmp, r);
-                            Log(LOG_INFO, "[fd=%d] read %d bytes massage read_buf %zu bytes rest", conn_fd, r, Conns.at(conn_fd).Get_read_buf().size());
+                            Log(LOG_INFO, "[fd=%d] 读到%d字节数据，read_buf剩余%zu字节", conn_fd, r, Conns.at(conn_fd).Get_read_buf().size());
                         }
                         else if (r == 0)
                         {
@@ -156,9 +174,8 @@ int main()
                                     }
                                     std::stringstream ss;
                                     ss << std::this_thread::get_id();
-                                    Log(LOG_INFO,"[tid=%s] finished handle_frame",ss.str().c_str());
-                                    uint64_t one = 1;
-                                    write(evfd,&one,sizeof(one));
+                                    Log(LOG_INFO,"[tid=%s] 线程完成切帧",ss.str().c_str());
+                                    notify_evfd(evfd);
                                 });
                             }
                             T.del_fd(conn_fd);
@@ -193,9 +210,8 @@ int main()
                             }
                             std::stringstream ss;
                             ss << std::this_thread::get_id();
-                            Log(LOG_INFO,"[tid=%s] finished handle_frame",ss.str().c_str());
-                            uint64_t one = 1;
-                            write(evfd,&one,sizeof(one));
+                            Log(LOG_INFO,"[tid=%s] 线程完成切帧",ss.str().c_str());
+                            notify_evfd(evfd);
                         });
                     }
                 }
@@ -209,7 +225,7 @@ int main()
                     if (s > 0)
                     {
                         Conns.at(conn_fd).Get_write_buf().erase(0, s);
-                        Log(LOG_INFO, "[fd=%d] write %d bytes write_buf %zu bytes rest", conn_fd, s, Conns.at(conn_fd).Get_write_buf().size());
+                        Log(LOG_INFO, "[fd=%d] 发出%d字节 write_buf剩余%zu字节", conn_fd, s, Conns.at(conn_fd).Get_write_buf().size());
                     }
                     if (s == 0)
                     {
@@ -223,7 +239,7 @@ int main()
                     {
                         if (errno == EAGAIN)
                         {
-                            Log(LOG_INFO, "[fd=%d] write EAGAIN write_buf = %zu bytes left", conn_fd, Conns.at(conn_fd).Get_write_buf().size());
+                            Log(LOG_INFO, "[fd=%d] write EAGAIN write_buf剩余%zu字节", conn_fd, Conns.at(conn_fd).Get_write_buf().size());
                             break;
                         }
                         close(conn_fd);
@@ -240,7 +256,7 @@ int main()
                 }
         });
         } });
-    Log(LOG_INFO, "[fd=%d]server started on port %d", listen_fd, PORT);
+    Log(LOG_INFO, "[fd=%d] 服务器启动，端口：%d", listen_fd, PORT);
     T.loop();
     return 0;
 }
